@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>برنامه ساخت و حل کوییز پیشرفته</title>
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="theme-toggle">
+        <button onclick="toggleTheme()">تغییر به حالت تیره/روشن</button>
+    </div>
+    <h1>ساخت و حل کوییز پیشرفته</h1>
+    <div class="quiz-form">
+        <h2>ایجاد سوال جدید</h2>
+        <div class="question-type">
+            <select id="question-type" onchange="toggleQuestionForm()">
+                <option value="multiple-choice">چند گزینه‌ای</option>
+                <option value="matching">وصل کردن (جور کردن)</option>
+                <option value="true-false">درست/غلط</option>
+            </select>
+        </div>
+        <div id="question-form">
+            <!-- فرم به صورت دینامیک پر می‌شود -->
+        </div>
+        <button onclick="addQuestion()">افزودن سوال</button>
+    </div>
+    <div class="quiz-display" id="quiz-display">
+        <h2>کوییز شما</h2>
+        <div id="questions-list"></div>
+        <button onclick="saveQuiz()">ذخیره کوییز</button>
+    </div>
+    <div class="quiz-player">
+        <h2>حل کوییز</h2>
+        <input type="file" id="quiz-file" accept=".json">
+        <button onclick="loadQuiz()">بارگذاری کوییز</button>
+        <div id="quiz-player-content"></div>
+        <button id="submit-quiz" style="display: none;" onclick="submitQuiz()">ارسال پاسخ‌ها</button>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
