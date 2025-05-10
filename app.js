@@ -23,36 +23,44 @@ function toggleQuestionForm() {
 
     if (questionType === "multiple-choice") {
         questionForm.innerHTML = `
-            <div class="question-block">
-                <textarea id="question-text" placeholder="متن سوال را وارد کنید"></textarea>
-                <input type="number" id="option-count" min="2" max="10" placeholder="تعداد گزینه‌ها" onchange="updateOptionInputs()">
-                <input type="number" id="timer-input" min="0" placeholder="زمان (ثانیه، 0 برای بدون زمان)">
-                <div id="options-container"></div>
-                <input type="text" id="correct-answer" placeholder="شماره گزینه صحیح">
-            </div>
-        `;
+                    <div class="question-block">
+                        <textarea id="question-text" placeholder="متن سوال را وارد کنید"></textarea>
+                        <input type="number" id="option-count" min="2" max="10" placeholder="تعداد گزینه‌ها" onchange="updateOptionInputs()">
+                        <input type="number" id="timer-input" min="0" placeholder="زمان (ثانیه، 0 برای بدون زمان)">
+                        <div id="options-container"></div>
+                        <input type="text" id="correct-answer" placeholder="شماره گزینه صحیح">
+                    </div>
+                `;
         updateOptionInputs();
     } else if (questionType === "matching") {
         questionForm.innerHTML = `
-            <div class="question-block">
-                <textarea id="question-text" placeholder="متن سوال را وارد کنید (مثال: موارد را جور کنید)"></textarea>
-                <input type="number" id="pair-count" min="2" max="10" placeholder="تعداد جفت‌ها" onchange="updatePairInputs()">
-                <input type="number" id="timer-input" min="0" placeholder="زمان (ثانیه، 0 برای بدون زمان)">
-                <div id="pairs-container"></div>
-            </div>
-        `;
+                    <div class="question-block">
+                        <textarea id="question-text" placeholder="متن سوال را وارد کنید (مثال: موارد را جور کنید)"></textarea>
+                        <input type="number" id="pair-count" min="2" max="10" placeholder="تعداد جفت‌ها" onchange="updatePairInputs()">
+                        <input type="number" id="timer-input" min="0" placeholder="زمان (ثانیه، 0 برای بدون زمان)">
+                        <div id="pairs-container"></div>
+                    </div>
+                `;
         updatePairInputs();
     } else if (questionType === "true-false") {
         questionForm.innerHTML = `
-            <div class="question-block">
-                <textarea id="question-text" placeholder="متن سوال را وارد کنید"></textarea>
-                <input type="number" id="timer-input" min="0" placeholder="زمان (ثانیه، 0 برای بدون زمان)">
-                <select id="correct-answer">
-                    <option value="true">درست</option>
-                    <option value="false">غلط</option>
-                </select>
-            </div>
-        `;
+                    <div class="question-block">
+                        <textarea id="question-text" placeholder="متن سوال را وارد کنید"></textarea>
+                        <input type="number" id="timer-input" min="0" placeholder="زمان (ثانیه، 0 برای بدون زمان)">
+                        <select id="correct-answer">
+                            <option value="true">درست</option>
+                            <option value="false">غلط</option>
+                        </select>
+                    </div>
+                `;
+    } else if (questionType === "fill-in-the-blank") {
+        questionForm.innerHTML = `
+                    <div class="question-block">
+                        <textarea id="question-text" placeholder="متن سوال را وارد کنید (جای خالی را با __ مشخص کنید)"></textarea>
+                        <input type="text" id="correct-answer" placeholder="پاسخ صحیح برای جای خالی">
+                        <input type="number" id="timer-input" min="0" placeholder="زمان (ثانیه، 0 برای بدون زمان)">
+                    </div>
+                `;
     }
 }
 
@@ -81,9 +89,9 @@ function updatePairInputs() {
         const pairDiv = document.createElement("div");
         pairDiv.className = "pair";
         pairDiv.innerHTML = `
-            <input type="text" class="left-pair" placeholder="مورد سمت چپ ${i}">
-            <input type="text" class="right-pair" placeholder="مورد سمت راست ${i}">
-        `;
+                    <input type="text" class="left-pair" placeholder="مورد سمت چپ ${i}">
+                    <input type="text" class="right-pair" placeholder="مورد سمت راست ${i}">
+                `;
         pairsContainer.appendChild(pairDiv);
     }
 }
@@ -161,6 +169,24 @@ function addQuestion() {
             correctAnswer: correctAnswer === "true",
             timer: timerInput,
         };
+    } else if (questionType === "fill-in-the-blank") {
+        const correctAnswer = document
+            .getElementById("correct-answer")
+            .value.trim();
+
+        if (!correctAnswer || !questionText.includes("__")) {
+            alert(
+                "لطفا پاسخ صحیح را وارد کنید و جای خالی را با __ در متن سوال مشخص کنید!"
+            );
+            return;
+        }
+
+        question = {
+            type: "fill-in-the-blank",
+            text: questionText,
+            correctAnswer: correctAnswer,
+            timer: timerInput,
+        };
     }
 
     questions.push(question);
@@ -180,52 +206,66 @@ function displayQuestions() {
 
         if (question.type === "multiple-choice") {
             questionDiv.innerHTML = `
-                <h3>سوال ${
-                    index + 1
-                } (چند گزینه‌ای) ${timerText}: ${question.text.replace(
+                        <h3>سوال ${
+                            index + 1
+                        } (چند گزینه‌ای) ${timerText}: ${question.text.replace(
                 /\n/g,
                 "<br>"
             )}</h3>
-                ${question.options
-                    .map(
-                        (option, i) => `
-                    <div class="option">${i + 1}. ${option} ${
-                            i + 1 === question.correctAnswer ? "(صحیح)" : ""
-                        }</div>
-                `
-                    )
-                    .join("")}
-            `;
+                        ${question.options
+                            .map(
+                                (option, i) => `
+                            <div class="option">${i + 1}. ${option} ${
+                                    i + 1 === question.correctAnswer
+                                        ? "(صحیح)"
+                                        : ""
+                                }</div>
+                        `
+                            )
+                            .join("")}
+                    `;
         } else if (question.type === "matching") {
             questionDiv.innerHTML = `
-                <h3>سوال ${
-                    index + 1
-                } (وصل کردن) ${timerText}: ${question.text.replace(
+                        <h3>سوال ${
+                            index + 1
+                        } (وصل کردن) ${timerText}: ${question.text.replace(
                 /\n/g,
                 "<br>"
             )}</h3>
-                ${question.pairs
-                    .map(
-                        (pair, i) => `
-                    <div class="pair">${i + 1}. ${pair.left} ↔ ${
-                            pair.right
-                        }</div>
-                `
-                    )
-                    .join("")}
-            `;
+                        ${question.pairs
+                            .map(
+                                (pair, i) => `
+                            <div class="pair">${i + 1}. ${pair.left} ↔ ${
+                                    pair.right
+                                }</div>
+                        `
+                            )
+                            .join("")}
+                    `;
         } else if (question.type === "true-false") {
             questionDiv.innerHTML = `
-                <h3>سوال ${
-                    index + 1
-                } (درست/غلط) ${timerText}: ${question.text.replace(
+                        <h3>سوال ${
+                            index + 1
+                        } (درست/غلط) ${timerText}: ${question.text.replace(
                 /\n/g,
                 "<br>"
             )}</h3>
-                <div class="option">پاسخ صحیح: ${
-                    question.correctAnswer ? "درست" : "غلط"
-                }</div>
-            `;
+                        <div class="option">پاسخ صحیح: ${
+                            question.correctAnswer ? "درست" : "غلط"
+                        }</div>
+                    `;
+        } else if (question.type === "fill-in-the-blank") {
+            questionDiv.innerHTML = `
+                        <h3>سوال ${
+                            index + 1
+                        } (جای خالی) ${timerText}: ${question.text.replace(
+                /\n/g,
+                "<br>"
+            )}</h3>
+                        <div class="option">پاسخ صحیح: ${
+                            question.correctAnswer
+                        }</div>
+                    `;
         }
         questionsList.appendChild(questionDiv);
     });
@@ -283,98 +323,113 @@ function displayQuizPlayer() {
         let timerHtml =
             question.timer > 0
                 ? `
-            <div class="timer-container">
-                <div class="timer" id="timer-${index}">${
+                    <div class="timer-container">
+                        <div class="timer" id="timer-${index}">${
                       index === currentQuestionIndex
                           ? `زمان باقی‌مانده: ${question.timer} ثانیه`
                           : "در انتظار"
                   }</div>
-                <div class="progress-bar" id="progress-bar-${index}">
-                    <div class="progress-bar-fill" style="width: 100%;"></div>
-                </div>
-            </div>
-        `
+                        <div class="progress-bar" id="progress-bar-${index}">
+                            <div class="progress-bar-fill" style="width: 100%;"></div>
+                        </div>
+                    </div>
+                `
                 : "";
 
         if (question.type === "multiple-choice") {
             questionDiv.innerHTML = `
-                <h3>سوال ${index + 1}: ${question.text.replace(
+                        <h3>سوال ${index + 1}: ${question.text.replace(
                 /\n/g,
                 "<br>"
             )}</h3>
-                ${timerHtml}
-                ${question.options
-                    .map(
-                        (option, i) => `
-                    <div class="option">
-                        <label><input type="radio" name="q${index}" value="${
-                            i + 1
-                        }" ${
-                            index !== currentQuestionIndex ? "disabled" : ""
-                        }> ${i + 1}. ${option}</label>
-                    </div>
-                `
-                    )
-                    .join("")}
-                <button class="submit-answer-btn" onclick="submitAnswer(${index})" ${
+                        ${timerHtml}
+                        ${question.options
+                            .map(
+                                (option, i) => `
+                            <div class="option">
+                                <label><input type="radio" name="q${index}" value="${
+                                    i + 1
+                                }" ${
+                                    index !== currentQuestionIndex
+                                        ? "disabled"
+                                        : ""
+                                }> ${i + 1}. ${option}</label>
+                            </div>
+                        `
+                            )
+                            .join("")}
+                        <button class="submit-answer-btn" onclick="submitAnswer(${index})" ${
                 index !== currentQuestionIndex ? "disabled" : ""
             }>پاسخ دادم</button>
-            `;
+                    `;
         } else if (question.type === "matching") {
             const rightOptions = question.pairs
                 .map((p) => p.right)
                 .sort(() => Math.random() - 0.5);
             questionDiv.innerHTML = `
-                <h3>سوال ${index + 1}: ${question.text.replace(
+                        <h3>سوال ${index + 1}: ${question.text.replace(
                 /\n/g,
                 "<br>"
             )}</h3>
-                ${timerHtml}
-                <div class="drag-container" id="drag-container-${index}">
-                    ${rightOptions
-                        .map(
-                            (opt) => `
-                        <div class="drag-item" draggable="true" data-value="${opt}" ondragstart="dragStart(event)" ondragend="dragEnd(event)">${opt}</div>
-                    `
-                        )
-                        .join("")}
-                </div>
-                ${question.pairs
-                    .map(
-                        (pair, i) => `
-                    <div class="pair">
-                        <span class="pair-label">${pair.left}</span>
-                        <div class="drop-zone" data-index="${i}" ondragover="dragOver(event)" ondrop="drop(event, ${index})" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" id="drop-zone-${index}-${i}"></div>
-                    </div>
-                `
-                    )
-                    .join("")}
-                <button class="submit-answer-btn" onclick="submitAnswer(${index})" ${
+                        ${timerHtml}
+                        <div class="drag-container" id="drag-container-${index}">
+                            ${rightOptions
+                                .map(
+                                    (opt) => `
+                                <div class="drag-item" draggable="true" data-value="${opt}" ondragstart="dragStart(event)" ondragend="dragEnd(event)">${opt}</div>
+                            `
+                                )
+                                .join("")}
+                        </div>
+                        ${question.pairs
+                            .map(
+                                (pair, i) => `
+                            <div class="pair">
+                                <span class="pair-label">${pair.left}</span>
+                                <div class="drop-zone" data-index="${i}" ondragover="dragOver(event)" ondrop="drop(event, ${index})" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" id="drop-zone-${index}-${i}"></div>
+                            </div>
+                        `
+                            )
+                            .join("")}
+                        <button class="submit-answer-btn" onclick="submitAnswer(${index})" ${
                 index !== currentQuestionIndex ? "disabled" : ""
             }>پاسخ دادم</button>
-                <button class="reset-btn" onclick="resetMatching(${index})" ${
+                        <button class="reset-btn" onclick="resetMatching(${index})" ${
                 index !== currentQuestionIndex ? "disabled" : ""
             }>بازگشت به حالت اولیه</button>
-            `;
+                    `;
         } else if (question.type === "true-false") {
             questionDiv.innerHTML = `
-                <h3>سوال ${index + 1}: ${question.text.replace(
+                        <h3>سوال ${index + 1}: ${question.text.replace(
                 /\n/g,
                 "<br>"
             )}</h3>
-                ${timerHtml}
-                <div class="option">
-                    <label><input type="radio" name="q${index}" value="true" ${
+                        ${timerHtml}
+                        <div class="option">
+                            <label><input type="radio" name="q${index}" value="true" ${
                 index !== currentQuestionIndex ? "disabled" : ""
             }> درست</label>
-                    <label><input type="radio" name="q${index}" value="false" ${
+                            <label><input type="radio" name="q${index}" value="false" ${
                 index !== currentQuestionIndex ? "disabled" : ""
             }> غلط</label>
-                </div>
-                <button class="submit-answer-btn" onclick="submitAnswer(${index})" ${
+                        </div>
+                        <button class="submit-answer-btn" onclick="submitAnswer(${index})" ${
                 index !== currentQuestionIndex ? "disabled" : ""
             }>پاسخ دادم</button>
-            `;
+                    `;
+        } else if (question.type === "fill-in-the-blank") {
+            questionDiv.innerHTML = `
+                        <h3>سوال ${index + 1}: ${question.text
+                .replace("__", "__")
+                .replace(/\n/g, "<br>")}</h3>
+                        ${timerHtml}
+                        <input type="text" name="q${index}" class="fill-blank-input" ${
+                index !== currentQuestionIndex ? "disabled" : ""
+            } placeholder="پاسخ خود را وارد کنید">
+                        <button class="submit-answer-btn" onclick="submitAnswer(${index})" ${
+                index !== currentQuestionIndex ? "disabled" : ""
+            }>پاسخ دادم</button>
+                    `;
         }
 
         quizPlayerContent.appendChild(questionDiv);
@@ -513,8 +568,8 @@ function resetMatching(questionIndex) {
         dragContainer.innerHTML = rightOptions
             .map(
                 (opt) => `
-            <div class="drag-item dropped" draggable="true" data-value="${opt}" ondragstart="dragStart(event)" ondragend="dragEnd(event)">${opt}</div>
-        `
+                    <div class="drag-item dropped" draggable="true" data-value="${opt}" ondragstart="dragStart(event)" ondragend="dragEnd(event)">${opt}</div>
+                `
             )
             .join("");
     }, 300);
@@ -588,6 +643,9 @@ function submitAnswer(questionIndex) {
                 droppedItem ? droppedItem.getAttribute("data-value") : null
             );
         });
+    } else if (question.type === "fill-in-the-blank") {
+        const input = document.querySelector(`input[name="q${questionIndex}"]`);
+        userAnswers[questionIndex] = input ? input.value.trim() : null;
     }
 
     disableQuestion(questionIndex);
@@ -696,6 +754,13 @@ function submitQuiz() {
                     )
                     .join("<br>");
             }
+        } else if (question.type === "fill-in-the-blank") {
+            isCorrect =
+                userAnswers[index] &&
+                userAnswers[index].toLowerCase() ===
+                    question.correctAnswer.toLowerCase();
+            correctAnswerText = question.correctAnswer;
+            userAnswerText = userAnswers[index] || "پاسخ داده نشده";
         }
 
         if (isCorrect) score++;
@@ -721,23 +786,25 @@ function submitQuiz() {
             resultHtml += question.options
                 .map(
                     (option, i) => `
-                <div class="option">${i + 1}. ${option}</div>
-            `
+                        <div class="option">${i + 1}. ${option}</div>
+                    `
                 )
                 .join("");
         } else if (question.type === "matching") {
             resultHtml += question.pairs
                 .map(
                     (pair, i) => `
-                <div class="pair">${pair.left} ↔ ${pair.right}</div>
-            `
+                        <div class="pair">${pair.left} ↔ ${pair.right}</div>
+                    `
                 )
                 .join("");
         } else if (question.type === "true-false") {
             resultHtml += `
-                <div class="option">درست</div>
-                <div class="option">غلط</div>
-            `;
+                        <div class="option">درست</div>
+                        <div class="option">غلط</div>
+                    `;
+        } else if (question.type === "fill-in-the-blank") {
+            resultHtml += `<div class="option">پاسخ: ${question.correctAnswer}</div>`;
         }
 
         questionDiv.innerHTML = resultHtml;
